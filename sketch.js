@@ -1,5 +1,6 @@
 class Item {
-  constructor() {
+  constructor(nextFoodDelta) {
+    let maxFoodDistance = nextFoodDelta * playerSpeed;
     this.x = random(max(0, lastFoodPosition - 0.5), min(1, lastFoodPosition + 0.5, 1));
     lastFoodPosition = this.x;
     this.y = -0.3;
@@ -14,6 +15,8 @@ let sounds;
 let music;
 let font;
 
+
+playerSpeed = 0.0005;
 playerPosition = 0.5;
 lastFoodPosition = 0.5;
 direction = 1;
@@ -45,9 +48,8 @@ function preload() {
   sounds[0] = loadSound("data/sound1.wav");
   sounds[1] = loadSound("data/sound2.wav");
   sounds[2] = loadSound("data/sound3.wav");
-  music = loadSound("music.mp3");
+  music = loadSound("data/music.mp3");
   music.amp(0.5);
-  music.loop();
 
   food = [];
 
@@ -64,6 +66,8 @@ function setup() {
   foodSprites[1].resize(width * itemScale, 0);
   foodSprites[2].resize(width * itemScale, 0);
   lifeImage.resize(width * itemScale * 1.2, 0);
+
+  music.loop();
 }
 
 function draw() {
@@ -78,14 +82,19 @@ function draw() {
     moving = 0;
   }
   if (!dead) {
-    playerPosition += moving * direction * millisSinceUpdate * 0.0005;
+    playerPosition += moving * direction * millisSinceUpdate * playerSpeed;
     playerPosition = max(min(playerPosition, 1), 0);
 
     if (lastUpdateTime > nextFoodTime) {
-      nextFoodTime = lastUpdateTime + random(1000) + max((20 - score), 1) * 50;
+
+      //value from 0 to 1, 0 is easy, 1 is hard
+      let difficulty = 1 - exp(-score / 10);
+      let nextFoodDelta = random((2 - difficulty) * 200, 1000);
+      nextFoodTime = lastUpdateTime + nextFoodDelta;
+      //nextFoodTime = lastUpdateTime + random(1000) + max((20-score), 1) * 50;
 
       //print("adding food", food.length);
-      food.push(new Item());
+      food.push(new Item(nextFoodDelta));
     }
   }
   //background(255);
