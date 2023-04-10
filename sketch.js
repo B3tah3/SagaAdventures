@@ -1,5 +1,5 @@
-class Item{
-  constructor(){
+class Item {
+  constructor() {
     this.x = random(max(0, lastFoodPosition - 0.5), min(1, lastFoodPosition + 0.5, 1));
     lastFoodPosition = this.x;
     this.y = -0.3;
@@ -29,36 +29,36 @@ dead = false;
 itemScale = 0.08;
 playerScale = 0.15;
 
-function preload(){
+function preload() {
   backgroundImage = loadImage("data/background.png");
   playerImage = loadImage("data/sagaChibi.png");
-  
+
   foodSprites = [];
   foodSprites[0] = loadImage("data/item1.png");
   foodSprites[1] = loadImage("data/item2.png");
   foodSprites[2] = loadImage("data/item3.png");
-  
+
   lifeImage = loadImage("data/life.png");
-  
-  soundFormats("wav");
+
+  soundFormats("wav", "mp3");
   sounds = [];
   sounds[0] = loadSound("data/sound1.wav");
   sounds[1] = loadSound("data/sound2.wav");
   sounds[2] = loadSound("data/sound3.wav");
-  //music = loadSound("music.wav");
-  //music.amp(0.5);
-  //music.loop();
-  
+  music = loadSound("music.mp3");
+  music.amp(0.5);
+  music.loop();
+
   food = [];
-  
+
   font = loadFont("data/NightinTokyo.ttf");
-  
+
 }
 
 function setup() {
   createCanvas(992, 558);
   frameRate(60);
-  
+
   playerImage.resize(width * playerScale, 0);
   foodSprites[0].resize(width * itemScale, 0);
   foodSprites[1].resize(width * itemScale, 0);
@@ -70,20 +70,20 @@ function draw() {
   millisSinceUpdate = int(millis() - lastUpdateTime);
   lastUpdateTime = millis();
   moving = 1;
-  if(keys[0] && !keys[1]){
+  if (keys[0] && !keys[1]) {
     direction = -1;
-  }else if(!keys[0] && keys[1]){
+  } else if (!keys[0] && keys[1]) {
     direction = 1;
-  }else if(!keys[0] && !keys[1]){
+  } else if (!keys[0] && !keys[1]) {
     moving = 0;
   }
-  if(!dead){
+  if (!dead) {
     playerPosition += moving * direction * millisSinceUpdate * 0.0005;
     playerPosition = max(min(playerPosition, 1), 0);
-    
-    if(lastUpdateTime > nextFoodTime){
-      nextFoodTime = lastUpdateTime + random(1000) + max((20-score), 1) * 50;
-      
+
+    if (lastUpdateTime > nextFoodTime) {
+      nextFoodTime = lastUpdateTime + random(1000) + max((20 - score), 1) * 50;
+
       //print("adding food", food.length);
       food.push(new Item());
     }
@@ -91,76 +91,76 @@ function draw() {
   //background(255);
   image(backgroundImage, 0, 0);
   push();
-  translate(playerPosition * width , height);
+  translate(playerPosition * width, height);
   scale(direction, 1);
   image(playerImage, -0.5 * playerImage.width, -playerImage.height);
   pop();
-  
+
   var i = food.length;
-  while(i--){
+  while (i--) {
     let f = food[i];
     f.y += millisSinceUpdate * 0.0005 * (dead ? 0 : 1);
-    if(f.y > 0.80 && abs(f.x - playerPosition) < 0.1){
+    if (f.y > 0.80 && abs(f.x - playerPosition) < 0.1) {
       food.splice(i, 1);
       score++;
       //print("caught", score);
       sounds[f.type].play();
       continue;
     }
-    if(f.y > 1){
+    if (f.y > 1) {
       food.splice(i, 1);
       lives--;
-      if(lives <= 0){
+      if (lives <= 0) {
         dead = true;
       }
       //print("dropped");
       continue;
     }
-    image(foodSprites[f.type], (f.x-itemScale/2) * width, f.y* height);
+    image(foodSprites[f.type], (f.x - itemScale / 2) * width, f.y * height);
   }
-  
-  if(dead){
+
+  if (dead) {
     fill(0, 0, 0, 128);
     rect(0, 0, width, height);
   }
-  
-  textSize(width/10);
+
+  textSize(width / 20);
   textFont(font);
   fill(255, 0, 0);
   textAlign(CENTER, TOP);
-  text("Score: " + score, width/2, 20);
-  
-  if(dead){
-    textSize(width/5);
+  text("Score: " + score, width / 2, 20);
+
+  if (dead) {
+    textSize(width / 5);
     textAlign(CENTER, CENTER);
-    text("YOU DIED", width/2, height/2);
+    text("YOU DIED", width / 2, height / 2);
   }
   i = lives;
-  while(i--){
-    image(lifeImage, width * (1 - itemScale*1.5 * (i+1)) , 0);
+  while (i--) {
+    image(lifeImage, width * (1 - itemScale * 1.5 * (i + 1)), 0);
   }
-  
+
 }
 
-function keyPressed(){
-  if(keyCode == LEFT_ARROW){
+function keyPressed() {
+  if (keyCode == LEFT_ARROW) {
     keys[0] = true;
     direction = -1;
-  }else if(keyCode == RIGHT_ARROW){
+  } else if (keyCode == RIGHT_ARROW) {
     keys[1] = true;
     direction = 1;
   }
-  if(key == ' ' && dead){
+  if (key == ' ' && dead) {
     dead = false;
     score = 0;
     food = [];
     lives = 3;
   }
 }
-function keyReleased(){
-  if(keyCode == LEFT_ARROW){
+function keyReleased() {
+  if (keyCode == LEFT_ARROW) {
     keys[0] = false;
-  }else if(keyCode == RIGHT_ARROW){
+  } else if (keyCode == RIGHT_ARROW) {
     keys[1] = false;
   }
 }
